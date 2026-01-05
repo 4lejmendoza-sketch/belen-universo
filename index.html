@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Belen, mi universo 💫</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: radial-gradient(circle at bottom, #050018, #000);
+      overflow: hidden;
+      font-family: 'Arial', sans-serif;
+      color: white;
+      height: 100%;
+    }
+
+    .stars {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      background-image:
+        radial-gradient(1px 1px at 20% 30%, white, transparent),
+        radial-gradient(1px 1px at 80% 40%, white, transparent),
+        radial-gradient(2px 2px at 50% 70%, white, transparent),
+        radial-gradient(1px 1px at 10% 80%, white, transparent),
+        radial-gradient(1px 1px at 90% 20%, white, transparent);
+      background-size: cover;
+      animation: twinkle 4s infinite alternate;
+    }
+
+    @keyframes twinkle {
+      from { opacity: 0.6; }
+      to { opacity: 1; }
+    }
+
+    .center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 2.5em;
+      text-align: center;
+      color: #ffd6f6;
+      text-shadow: 0 0 20px #ff7edb;
+      animation: heartbeat 2s infinite;
+      z-index: 2;
+    }
+
+    @keyframes heartbeat {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); }
+      50% { transform: translate(-50%, -50%) scale(1.1); }
+    }
+
+    .word {
+      position: absolute;
+      font-size: 1em;
+      color: #fff;
+      cursor: pointer;
+      text-shadow: 0 0 10px #fff;
+      animation: float 20s linear infinite;
+    }
+
+    @keyframes float {
+      from { transform: translateY(100vh); }
+      to { transform: translateY(-120vh); }
+    }
+
+    .message {
+      position: fixed;
+      bottom: 15%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.7);
+      padding: 15px 20px;
+      border-radius: 20px;
+      display: none;
+      text-align: center;
+      font-size: 1em;
+      box-shadow: 0 0 20px #ff7edb;
+      max-width: 85%;
+    }
+
+    audio {
+      display: none;
+    }
+
+    .final {
+      position: fixed;
+      bottom: 5%;
+      width: 100%;
+      text-align: center;
+      font-size: 1.5em;
+      color: #ff9fe5;
+      text-shadow: 0 0 15px #ff7edb;
+      animation: fadein 4s ease-in-out infinite alternate;
+    }
+
+    @keyframes fadein {
+      from { opacity: 0.6; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="stars"></div>
+
+<div class="center">Belen 👸🏻💗</div>
+
+<div class="message" id="msg"></div>
+
+<div class="final">Te amo ❤️‍🩹</div>
+
+<audio autoplay loop>
+  <source src="https://cdn.pixabay.com/download/audio/2022/10/30/audio_6f8d7c5bb1.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+const phrases = [
+  {
+    word: "Preciosa",
+    text: "Eres preciosa mi niña 🥹💗, en cada uno de tus aspectos: tus ojitos de los que me enamoré el primer día que nos conocimos bbyy, tu carita tan tiernita mamor, y tu vocesita que me da esa paz que solo en usted consigo 😘"
+  },
+  {
+    word: "Bella",
+    text: "Eres bella mi niña, bella por fuera y aún más por dentro, una belleza que ilumina mi mundo 💫"
+  },
+  {
+    word: "Divina",
+    text: "Divina como tu esencia bbyyy, esa dulzura que nace de tu corazón 🥰"
+  },
+  {
+    word: "Sonrisa",
+    text: "Tu sonrisa es mi lugar seguro, donde todo se calma y todo tiene sentido 😍"
+  },
+  {
+    word: "Mirada",
+    text: "En tu mirada encontré hogar, paz y sueños… y ver su belleza es mi regalo diario 💗"
+  },
+  {
+    word: "Hogar",
+    text: "Hogar es donde estás tú mi niña, donde mi alma descansa ❤️‍🩹"
+  },
+  {
+    word: "Sueño",
+    text: "Contigo es con quien quiero despertar todas las mañanas, ver tu belleza y sentir tu amor 😘"
+  },
+  {
+    word: "Siempre",
+    text: "Siempre contigo, siempre eligiéndote, siempre amándote bbyyy 💗"
+  }
+];
+
+const msgBox = document.getElementById("msg");
+
+phrases.forEach((p, i) => {
+  const el = document.createElement("div");
+  el.className = "word";
+  el.innerText = p.word;
+  el.style.left = Math.random() * 90 + "%";
+  el.style.animationDuration = (15 + Math.random() * 10) + "s";
+  el.onclick = () => {
+    msgBox.innerText = p.text;
+    msgBox.style.display = "block";
+    setTimeout(() => msgBox.style.display = "none", 6000);
+  };
+  document.body.appendChild(el);
+});
+</script>
+
+</body>
+  </html>
