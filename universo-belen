@@ -1,1 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Universo Belén</title>
+<style>
+body { margin:0; overflow:hidden; background:black; }
+#hint {
+  position:fixed;
+  bottom:20px;
+  width:100%;
+  text-align:center;
+  color:rgba(255,255,255,0.6);
+  font-family:Arial;
+}
+</style>
+</head>
+<body>
 
+<div id="hint">💖 Tocá y explorá mi universo 💖</div>
+
+<audio id="music" loop>
+  <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_7c7a1e1d7b.mp3">
+</audio>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/loaders/FontLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/geometries/TextGeometry.js"></script>
+
+<script>
+/* 🎶 Música */
+const music=document.getElementById("music");
+document.body.addEventListener("click",()=>{
+  music.volume=0.35;
+  music.play();
+  document.getElementById("hint").style.display="none";
+},{once:true});
+
+/* 🌌 Escena */
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,0.1,1000);
+camera.position.z=60;
+
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(innerWidth,innerHeight);
+document.body.appendChild(renderer.domElement);
+
+const controls=new THREE.OrbitControls(camera,renderer.domElement);
+controls.enableDamping=true;
+
+/* ⭐ Estrellas */
+const starsGeo=new THREE.BufferGeometry();
+const starPos=[];
+for(let i=0;i<3500;i++){
+  starPos.push((Math.random()-0.5)*500,(Math.random()-0.5)*500,(Math.random()-0.5)*500);
+}
+starsGeo.setAttribute("position",new THREE.Float32BufferAttribute(starPos,3));
+const starsMat=new THREE.PointsMaterial({color:0xffffff,size:0.7});
+const stars=new THREE.Points(starsGeo,starsMat);
+scene.add(stars);
+
+/* ❤️ Corazón */
+const heartPts=[];
+for(let t=0;t<Math.PI*2;t+=0.05){
+  heartPts.push(new THREE.Vector3(
+    16*Math.pow(Math.sin(t),3),
+    13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t),
+    0
+  ));
+}
+const heart=new THREE.Points(
+  new THREE.BufferGeometry().setFromPoints(heartPts),
+  new THREE.PointsMaterial({color:0xff4d6d,size:0.7})
+);
+heart.scale.set(0.6,0.6,0.6);
+scene.add(heart);
+
+/* 💬 Palabras */
+const wordData={
+  "Bella":"Eres belleza en cada latido 💖",
+  "Inigualable":"No existe nadie como tú ✨",
+  "Hermosa":"Hermosa por fuera y por dentro 🌸",
+  "Perfecta":"Perfecta para mi universo 💫",
+  "Mi vida":"Eres mi razón 🤍"
+};
+
+const words=Object.keys(wordData);
+const wordMeshes=[];
+let belenMesh,fontLoaded;
+
+/* ✨ Texto */
+const loader=new THREE.FontLoader();
+loader.load("https://threejs.org/examples/fonts/helvetiker_regular.typeface.json",font=>{
+fontLoaded=font;
+
+/* BELÉN */
+const geo=new THREE.TextGeometry("Belén",{font,size:6,height:1});
+geo.center();
+belenMesh=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({
+  color:0xffb3c6,emissive:0xff4d6d
+}));
+scene.add(belenMesh);
+
+/* Palabras orbitando */
+words.forEach((w,i)=>{
+  const g=new THREE.TextGeometry(w,{font,size:2,height:0.4});
+  g.center();
+  const m=new THREE.MeshStandardMaterial({color:0xffffff});
+  const mesh=new THREE.Mesh(g,m);
+  mesh.userData={angle:i/words.length*Math.PI*2,text:wordData[w]};
+  scene.add(mesh);
+  wordMeshes.push(mesh);
+});
+});
+
+/* 💡 Luces */
+scene.add(new THREE.PointLight(0xffffff,2).position.set(50,50,50));
+scene.add(new THREE.AmbientLight(0xffffff,0.6));
+
+/* ✍️ Mensajes */
+let activeMessage=null;
+function showTypedMessage(text,scaleY=-10){
+  if(activeMessage) scene.remove(activeMessage);
+  let shown="";
+  const geo=new THREE.TextGeometry("",{font:fontLoaded,size:2.2,height:0.4});
+  const mat=new THREE.MeshStandardMaterial({color:0xffc0d9,emissive:0xff4d6d});
+  activeMessage=new THREE.Mesh(geo,mat);
+  activeMessage.position.y=scaleY;
+  scene.add(activeMessage);
+
+  let i=0;
+  const interval=setInterval(()=>{
+    shown+=text[i++];
+    activeMessage.geometry.dispose();
+    activeMessage.geometry=new THREE.TextGeometry(shown,{font:fontLoaded,size:2.2,height:0.4});
+    activeMessage.geometry.center();
+    if(i>=text.length) clearInterval(interval);
+  },60);
+}
+
+/* 🖱️ Click */
+const raycaster=new THREE.Raycaster();
+const mouse=new THREE.Vector2();
+addEventListener("click",e=>{
+mouse.x=e.clientX/innerWidth*2-1;
+mouse.y=-(e.clientY/innerHeight)*2+1;
+raycaster.setFromCamera(mouse,camera);
+
+if(belenMesh && raycaster.intersectObject(belenMesh).length){
+  showTypedMessage("Eres mi universo, mi todo bbyy 👸🏻💗💗",-12);
+}
+
+wordMeshes.forEach(m=>{
+  if(raycaster.intersectObject(m).length){
+    showTypedMessage(m.userData.text,-16);
+  }
+});
+});
+
+/* 🌀 Animación */
+function animate(){
+requestAnimationFrame(animate);
+heart.rotation.z+=0.01;
+heart.scale.setScalar(0.6+Math.sin(Date.now()*0.003)*0.05);
+
+wordMeshes.forEach(m=>{
+  m.userData.angle+=0.002;
+  m.position.set(
+    Math.cos(m.userData.angle)*25,
+    Math.sin(m.userData.angle)*10,
+    Math.sin(m.userData.angle)*25
+  );
+});
+
+controls.update();
+renderer.render(scene,camera);
+}
+animate();
+
+addEventListener("resize",()=>{
+camera.aspect=innerWidth/innerHeight;
+camera.updateProjectionMatrix();
+renderer.setSize(innerWidth,innerHeight);
+});
+</script>
+</body>
+</html>
